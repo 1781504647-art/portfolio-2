@@ -190,14 +190,17 @@
   .sw-head{display:none;align-items:center;justify-content:space-between;margin:0 0 6px;}
   .sw-arrow{width:34px;height:34px;border-radius:50%;border:1px solid rgb(255 255 255 / .18);background:rgb(255 255 255 / .06);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .3s,border-color .3s;}
   .sw-arrow:hover{background:rgb(255 255 255 / .16);border-color:rgb(255 255 255 / .4);}
-  .sw-slider{display:none;width:100%;margin:8px 0 0;height:22px;cursor:pointer;accent-color:#c9a86a;background:transparent;}
-  .sw-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#c9a86a;border:2px solid #0d0c0c;box-shadow:0 0 0 1px rgb(255 255 255 / .25);}
+  .sw-slider,.cat-slider{display:none;width:100%;margin:10px 0 2px;height:14px;cursor:pointer;accent-color:rgba(201,168,106,.55);background:transparent;opacity:.85;}
+  .sw-slider::-webkit-slider-runnable-track,.cat-slider::-webkit-slider-runnable-track{height:3px;border-radius:3px;background:rgba(255,255,255,.14);}
+  .sw-slider::-webkit-slider-thumb,.cat-slider::-webkit-slider-thumb{-webkit-appearance:none;width:12px;height:12px;margin-top:-4.5px;border-radius:50%;background:rgba(201,168,106,.7);border:1px solid rgba(255,255,255,.35);box-shadow:none;}
+  .sw-slider::-moz-range-track,.cat-slider::-moz-range-track{height:3px;border-radius:3px;background:rgba(255,255,255,.14);}
+  .sw-slider::-moz-range-thumb,.cat-slider::-moz-range-thumb{width:12px;height:12px;border-radius:50%;background:rgba(201,168,106,.7);border:1px solid rgba(255,255,255,.35);}
   @media (min-width:901px){ .sw-head{display:flex;} }
-  @media (max-width:900px){ .sw-slider{display:block;} }
-  .cat-dots{display:flex;justify-content:center;gap:7px;padding:2px 0 0;}
-  .cat-dots .dot{width:7px;height:7px;border-radius:50%;border:0;padding:0;background:rgb(255 255 255 / .28);cursor:pointer;transition:background .3s,transform .3s;}
-  .cat-dots .dot:hover{background:rgb(255 255 255 / .6);}
-  .cat-dots .dot.on{background:#c9a86a;transform:scale(1.3);}
+  @media (max-width:900px){ .sw-slider,.cat-slider{display:block;} }
+  .cat-dots{display:flex;justify-content:center;gap:6px;padding:2px 0 0;}
+  .cat-dots .dot{width:5px;height:5px;border-radius:50%;border:0;padding:0;background:rgb(255 255 255 / .2);cursor:pointer;transition:background .3s,transform .3s;}
+  .cat-dots .dot:hover{background:rgb(255 255 255 / .4);}
+  .cat-dots .dot.on{background:rgba(201,168,106,.8);transform:scale(1.2);}
   @media (max-width:900px){
     .thumb-page{grid-template-columns:repeat(4,1fr);}
   }
@@ -446,8 +449,10 @@
     .hero-nav-wrap{padding:16px 16px 0;}
     .nav-cta{padding:6px 16px;font-size:13px;}
     .hero-title{font-size:clamp(2.4rem,13vw,3.2rem);margin-bottom:24px;}
-    .hero-pill-text{font-size:13px;}
-    .hero-pill{padding:6px 6px 6px 16px;}
+    .hero-pill-text{font-size:12.5px;line-height:1.6;}
+    .hero-pill{max-width:440px;padding:5px 5px 5px 14px;background:rgba(255,255,255,.035);border-color:rgba(255,255,255,.14);}
+    .hero-pill-btn{padding:8px;}
+    .hero-pill-btn svg{width:16px;height:16px;}
     .hero-sub{font-size:13px;}
     .hero-socials{padding-bottom:32px;}
   }
@@ -902,7 +907,7 @@
   </div>
 </section>
 
-<!-- ===== 作品精选 ===== -->
+<!-- ===== 作品详解 ===== -->
 <!-- ===== 关于我 ===== -->
 <section class="block" id="about">
   <div class="container">
@@ -977,8 +982,8 @@
 <section class="block" id="works">
   <div class="container">
     <div class="section-head">
-      <div class="kicker" data-i18n="worksKicker">SELECTED WORKS</div>
-      <h2 data-i18n="worksTitle">作品精选</h2>
+      <div class="kicker" data-i18n="worksKicker">WORKS IN DETAIL</div>
+      <h2 data-i18n="worksTitle">作品详解</h2>
       <p data-i18n="worksSub">精选作品：AI 跑图、广告视觉、买量图、可爱卡通、异形图与长图 H5。点击任意作品可查看大图。</p>
     </div>
     <div id="catBlocks"></div>
@@ -2410,7 +2415,7 @@
       heroEyebrow:"游戏平面设计师 · 线上作品集",
       heroSub:"专注游戏平面设计，擅长广告视觉、H5 页面与 AI 辅助创作。",
       ctaWorks:"浏览作品", ctaContact:"联系我", heroAbout:"关于我", scrollHint:"向下滚动",
-      worksKicker:"SELECTED WORKS", worksTitle:"作品精选",
+      worksKicker:"WORKS IN DETAIL", worksTitle:"作品详解",
       worksSub:"精选作品：AI 跑图、广告视觉、买量图、可爱卡通、异形图与长图 H5。点击任意作品可查看大图。",
       fAll:"全部", fLayout:"AI跑图（简单排版）", fPaint:"AI跑图（画面）", fAd:"广告图", fCute:"可爱卡通类型", fBuy:"买量图", fShape:"异形图", fH5:"长图H5",
       subAll:"全部子类", subUi:"UI", subScene:"场景概念", subMei:"美宣图", subWen:"文案", emptySub:"该分类作品整理中，敬请期待",
@@ -2430,7 +2435,7 @@
       heroEyebrow:"GAME GRAPHIC DESIGNER · ONLINE PORTFOLIO",
       heroSub:"Focusing on game graphic design: ad visuals, H5 pages and AI-assisted creation.",
       ctaWorks:"View Works", ctaContact:"Contact", heroAbout:"About Me", scrollHint:"Scroll down",
-      worksKicker:"SELECTED WORKS", worksTitle:"Selected Works",
+      worksKicker:"WORKS IN DETAIL", worksTitle:"Works in Detail",
       worksSub:"Selected works: AI art, ad visuals, buy-rate ads, cute cartoons, special shapes and H5 long pages. Click any piece to view it large.",
       fAll:"All", fLayout:"AI Layout", fPaint:"AI Art", fAd:"Ad Visual", fCute:"Cute Cartoon", fBuy:"Buy-rate Ads", fShape:"Special Shapes", fH5:"H5 Long Pages",
       subAll:"All", subUi:"UI", subScene:"Scene Concepts", subMei:"Key Visual", subWen:"Copy", emptySub:"Works in this category are being prepared - stay tuned",
@@ -2547,9 +2552,10 @@
     showPage = pi;
     track.style.transform = "translateX(-" + (pi * 100) + "%)";
     var ds = wall.querySelectorAll(".cat-dots .dot");
-    ds.forEach(function(d, i){ d.classList.toggle("on", i === pi); });
+    var nearest = Math.round(pi);
+    ds.forEach(function(d, i){ d.classList.toggle("on", i === nearest); });
     var sl = wall.querySelector(".sw-slider");
-    if(sl) sl.value = pi;
+    if(sl) sl.value = nearest;
   }
   function goShowStep(dir){
     var wall = document.getElementById("thumbWall");
@@ -2571,8 +2577,12 @@
     function endSwipe(){
       track.classList.remove("dragging");
       if(moved !== 0){
-        if(Math.abs(moved) > vw() * 0.12){ wall.__swiped = true; goShowStep(moved < 0 ? 1 : -1); }
-        else { goShow(showPage); }
+        if(Math.abs(moved) > vw() * 0.03){
+          goShow(showPage - moved / vw());
+          wall.__swiped = true;
+        } else {
+          goShow(showPage);
+        }
         moved = 0;
       }
     }
@@ -2729,7 +2739,8 @@
             '<button class="cat-nav cat-next" aria-label="下一批" title="下一批"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button>' +
           '</div>' +
         '</div>' +
-        '<div class="cat-stage"><div class="cat-track">' + pagesHtml + '</div></div>';
+        '<div class="cat-stage"><div class="cat-track">' + pagesHtml + '</div></div>' +
+        '<input type="range" class="cat-slider" min="0" max="100" value="0" step="1" aria-label="滑动浏览">';
       host.appendChild(block);
       block.querySelectorAll(".work-card").forEach(bindCard);
       bindCatBlock(block);
@@ -2742,6 +2753,12 @@
     if(!track || !stage) return;
     var offset = 0;
     var timer = null;
+    var slider = block.querySelector(".cat-slider");
+    function syncSlider(){
+      if(!slider) return;
+      var m = maxOff();
+      slider.value = m > 0 ? Math.round(offset / m * 100) : 0;
+    }
     function stopAuto(){ if(timer){ clearInterval(timer); timer = null; } }
     function startAuto(){
       stopAuto();
@@ -2755,26 +2772,36 @@
       if(offset > max) offset = 0;
       if(offset < 0) offset = max;
       track.style.transform = "translate3d(" + (-offset) + "px,0,0)";
+      syncSlider();
+    }
+    if(slider){
+      slider.addEventListener("input", function(){
+        var m = maxOff();
+        offset = m > 0 ? (parseInt(slider.value, 10) || 0) / 100 * m : 0;
+        track.style.transform = "translate3d(" + (-offset) + "px,0,0)";
+        stopAuto(); startAuto();
+      });
     }
     function goDir(dir){ go(dir); stopAuto(); startAuto(); }
     block.querySelector(".cat-prev").addEventListener("click", function(){ goDir(-1); });
     block.querySelector(".cat-next").addEventListener("click", function(){ goDir(1); });
-    window.addEventListener("resize", function(){ offset = 0; track.style.transform = "translate3d(0,0,0)"; stopAuto(); startAuto(); });
+    window.addEventListener("resize", function(){ offset = 0; track.style.transform = "translate3d(0,0,0)"; syncSlider(); stopAuto(); startAuto(); });
     var sx = 0, sy = 0, moved = 0, started = false, md = false, mx = 0, my = 0;
     function maxOff(){ return Math.max(0, track.scrollWidth - stage.clientWidth); }
     function endDrag(){
       track.classList.remove("dragging");
       if(moved !== 0){
-        if(Math.abs(moved) > stage.clientWidth * 0.1){
-          var dir = moved < 0 ? 1 : -1;
-          var pages = Math.max(1, Math.round(Math.abs(moved) / (stage.clientWidth * 0.92)));
-          offset += dir * stage.clientWidth * 0.92 * pages;
+        if(Math.abs(moved) > 12){
           var m = maxOff();
-          if(offset > m) offset = 0;
-          if(offset < 0) offset = maxOff();
+          offset = offset - moved;
+          if(offset > m) offset = m;
+          if(offset < 0) offset = 0;
+          track.style.transform = "translate3d(" + (-offset) + "px,0,0)";
+          syncSlider();
           block.__swiped = true;
+        } else {
+          track.style.transform = "translate3d(" + (-offset) + "px,0,0)";
         }
-        track.style.transform = "translate3d(" + (-offset) + "px,0,0)";
         moved = 0;
       }
       stopAuto(); startAuto();
