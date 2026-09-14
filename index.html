@@ -171,9 +171,10 @@
   #showCtl .cell{font-size:13px;padding:0 8px;}
   #showCtl .cell.active{color:#fff;}
   .thumb-wall{display:flex;flex-direction:column;gap:10px;min-height:120px;padding:6px 0 2px;}
-  .thumb-page{display:none;grid-template-columns:repeat(5,1fr);gap:6px;}
-  .thumb-page.on{display:grid;animation:fadePage .45s ease;}
-  @keyframes fadePage{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+  .thumb-viewport{overflow:hidden;border-radius:10px;touch-action:pan-y;}
+  .thumb-track{display:flex;transition:transform .5s cubic-bezier(.22,.61,.36,1);will-change:transform;}
+  .thumb-track.dragging{transition:none;}
+  .thumb-page{flex:0 0 100%;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;}
   .thumb-wall .thumb{position:relative;height:190px;border-radius:8px;overflow:hidden;border:1px solid rgb(255 255 255 / .14);background:#0d0c0c;cursor:zoom-in;padding:0;line-height:0;
     transition:transform .35s var(--retake-ease),border-color .35s var(--retake-ease),box-shadow .35s var(--retake-ease);}
   .th-inner{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden;}
@@ -186,6 +187,13 @@
   .thumb-wall.h5-mode .thumb{height:582px;}
   .th-hint{position:absolute;left:0;right:0;bottom:0;height:28px;background:linear-gradient(transparent,rgba(10,9,8,.85));opacity:0;transition:opacity .3s;pointer-events:none;display:flex;align-items:flex-end;justify-content:center;padding-bottom:4px;font-size:10px;letter-spacing:.12em;color:rgba(255,255,255,.8);}
   .thumb.tall .th-hint{opacity:1;}
+  .sw-head{display:none;align-items:center;justify-content:space-between;margin:0 0 6px;}
+  .sw-arrow{width:34px;height:34px;border-radius:50%;border:1px solid rgb(255 255 255 / .18);background:rgb(255 255 255 / .06);color:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:background .3s,border-color .3s;}
+  .sw-arrow:hover{background:rgb(255 255 255 / .16);border-color:rgb(255 255 255 / .4);}
+  .sw-slider{display:none;width:100%;margin:8px 0 0;height:22px;cursor:pointer;accent-color:#c9a86a;background:transparent;}
+  .sw-slider::-webkit-slider-thumb{-webkit-appearance:none;width:16px;height:16px;border-radius:50%;background:#c9a86a;border:2px solid #0d0c0c;box-shadow:0 0 0 1px rgb(255 255 255 / .25);}
+  @media (min-width:901px){ .sw-head{display:flex;} }
+  @media (max-width:900px){ .sw-slider{display:block;} }
   .cat-dots{display:flex;justify-content:center;gap:7px;padding:2px 0 0;}
   .cat-dots .dot{width:7px;height:7px;border-radius:50%;border:0;padding:0;background:rgb(255 255 255 / .28);cursor:pointer;transition:background .3s,transform .3s;}
   .cat-dots .dot:hover{background:rgb(255 255 255 / .6);}
@@ -204,7 +212,7 @@
     .thumb-wall.h5-mode .thumb{height:466px;}
   }
   @media (prefers-reduced-motion: reduce){
-    .thumb-page .thumb,.cat-dots .dot{transition-duration:1ms;}
+    .thumb-page .thumb,.cat-dots .dot,.thumb-track{transition-duration:1ms;}
   }
   .chip{
     font-family:var(--font-body);font-size:13px;letter-spacing:.04em;
@@ -2524,14 +2532,85 @@
     var pages = wall.querySelectorAll(".thumb-page").length;
     if(pages < 2) return;
     showTimer = setInterval(function(){
-      var gs = wall.querySelectorAll(".thumb-page");
-      var ds = wall.querySelectorAll(".cat-dots .dot");
-      var cur = 0;
-      gs.forEach(function(g, i){ if(g.classList.contains("on")) cur = i; });
-      var ni = (cur + 1) % pages;
-      gs.forEach(function(g, i){ g.classList.toggle("on", i === ni); });
-      ds.forEach(function(d, i){ d.classList.toggle("on", i === ni); });
+      goShowStep(1);
     }, 4200);
+  }
+  var showPage = 0;
+  function goShow(pi){
+    var wall = document.getElementById("thumbWall");
+    if(!wall) return;
+    var track = wall.querySelector(".thumb-track");
+    var gs = wall.querySelectorAll(".thumb-page");
+    if(!track || !gs.length) return;
+    pi = Math.max(0, Math.min(gs.length - 1, pi));
+    showPage = pi;
+    track.style.transform = "translateX(-" + (pi * 100) + "%)";
+    var ds = wall.querySelectorAll(".cat-dots .dot");
+    ds.forEach(function(d, i){ d.classList.toggle("on", i === pi); });
+    var sl = wall.querySelector(".sw-slider");
+    if(sl) sl.value = pi;
+  }
+  function goShowStep(dir){
+    var wall = document.getElementById("thumbWall");
+    var gs = wall.querySelectorAll(".thumb-page");
+    if(!gs.length) return;
+    goShow((showPage + dir + gs.length) % gs.length);
+  }
+  function bindShowSwipe(){
+    var wall = document.getElementById("thumbWall");
+    if(!wall || wall.__swipe) return;
+    wall.__swipe = true;
+    var track = wall.querySelector(".thumb-track");
+    if(!track) return;
+    var sx = 0, sy = 0, moved = 0, started = false, md = false, mx = 0, my = 0;
+    function vw(){ var vp = wall.querySelector(".thumb-viewport"); return vp ? vp.clientWidth : 600; }
+    function follow(x){
+      track.style.transform = "translateX(calc(" + (-showPage * 100) + "% + " + x + "px))";
+    }
+    function endSwipe(){
+      track.classList.remove("dragging");
+      if(moved !== 0){
+        if(Math.abs(moved) > vw() * 0.12){ wall.__swiped = true; goShowStep(moved < 0 ? 1 : -1); }
+        else { goShow(showPage); }
+        moved = 0;
+      }
+    }
+    wall.addEventListener("touchstart", function(e){
+      if(wall.querySelectorAll(".thumb-page").length < 2) return;
+      var t = e.touches[0]; sx = t.clientX; sy = t.clientY; moved = 0; started = true;
+    }, {passive:true});
+    wall.addEventListener("touchmove", function(e){
+      if(!started) return;
+      var t = e.touches[0]; var dx = t.clientX - sx, dy = t.clientY - sy;
+      if(moved === 0 && Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      if(Math.abs(dx) > Math.abs(dy)){
+        e.preventDefault();
+        track.classList.add("dragging");
+        moved = dx;
+        follow(dx);
+      }
+    }, {passive:false});
+    wall.addEventListener("touchend", function(){ if(!started) return; started = false; endSwipe(); }, {passive:true});
+    wall.addEventListener("mousedown", function(e){
+      if(wall.querySelectorAll(".thumb-page").length < 2) return;
+      mx = e.clientX; my = e.clientY; md = true; moved = 0;
+    });
+    window.addEventListener("mousemove", function(e){
+      if(!md) return;
+      var dx = e.clientX - mx, dy = e.clientY - my;
+      if(moved === 0 && Math.abs(dx) < 6 && Math.abs(dy) < 6) return;
+      if(Math.abs(dx) > Math.abs(dy)){
+        e.preventDefault();
+        track.classList.add("dragging");
+        moved = dx;
+        follow(dx);
+      }
+    }, {passive:false});
+    window.addEventListener("mouseup", function(){ if(!md) return; md = false; endSwipe(); });
+    wall.addEventListener("dragstart", function(e){ e.preventDefault(); });
+    wall.addEventListener("click", function(e){
+      if(wall.__swiped){ e.preventDefault(); e.stopPropagation(); wall.__swiped = false; }
+    }, true);
   }
   (function(){
     var sw = document.getElementById("showcase");
@@ -2559,17 +2638,20 @@
       ctl.appendChild(b);
     });
     bindGlass(ctl);
-    wall.innerHTML = "";
+    wall.innerHTML = '<div class="sw-head"><button type="button" class="sw-arrow sw-prev" aria-label="上一页" title="上一页"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 18l-6-6 6-6"/></svg></button><button type="button" class="sw-arrow sw-next" aria-label="下一页" title="下一页"><svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18l6-6-6-6"/></svg></button></div><div class="thumb-viewport"><div class="thumb-track"></div></div><div class="cat-dots"></div><input type="range" class="sw-slider" min="0" max="0" value="0" step="1" aria-label="滑动切换页面">';
+    var track = wall.querySelector(".thumb-track");
+    var dotsBox = wall.querySelector(".cat-dots");
+    var slider = wall.querySelector(".sw-slider");
+    var swPrev = wall.querySelector(".sw-prev");
+    var swNext = wall.querySelector(".sw-next");
     var list = WORKS.filter(function(w){ return w.cat === showCat; });
     var isH5 = showCat === "h5";
     wall.classList.toggle("h5-mode", isH5);
     var perPage = isH5 ? 5 : (window.innerWidth >= 900 ? 15 : (window.innerWidth >= 500 ? 12 : 6));
     var pages = Math.max(1, Math.ceil(list.length / perPage));
-    var dotsBox = document.createElement("div");
-    dotsBox.className = "cat-dots";
     for(var p = 0; p < pages; p++){
       var pg = document.createElement("div");
-      pg.className = "thumb-page" + (p === 0 ? " on" : "");
+      pg.className = "thumb-page";
       var slice = list.slice(p * perPage, p * perPage + perPage);
       slice.forEach(function(w){
         var a = document.createElement("button");
@@ -2590,30 +2672,35 @@
         a.appendChild(inner);
         var hint = document.createElement("span");
         hint.className = "th-hint";
-        hint.textContent = lang === "zh" ? "上下滑动查看" : "Scroll to view";
+        hint.textContent = lang === "zh" ? "左右滑动切换" : "Swipe to browse";
         a.appendChild(hint);
         var idx = WORKS.indexOf(w);
         a.addEventListener("click", function(){ openLightbox(idx); });
         pg.appendChild(a);
       });
-      wall.appendChild(pg);
+      track.appendChild(pg);
       var dot = document.createElement("button");
       dot.type = "button";
       dot.className = "dot" + (p === 0 ? " on" : "");
       dot.setAttribute("aria-label", "第 " + (p + 1) + " 页");
       (function(pi){
         dot.addEventListener("click", function(){
-          wall.querySelectorAll(".thumb-page").forEach(function(g, gi){ g.classList.toggle("on", gi === pi); });
-          dotsBox.querySelectorAll(".dot").forEach(function(d, di){ d.classList.toggle("on", di === pi); });
+          goShow(pi);
+          stopShowTimer(); startShowTimer();
         });
       })(p);
       dotsBox.appendChild(dot);
-      (function(){
-        var _d = dot;
-        _d.addEventListener("click", function(){ stopShowTimer(); startShowTimer(); });
-      })();
     }
-    wall.appendChild(dotsBox);
+    slider.max = pages - 1;
+    slider.addEventListener("input", function(){
+      goShow(parseInt(slider.value, 10) || 0);
+      stopShowTimer(); startShowTimer();
+    });
+    swPrev.addEventListener("click", function(){ goShowStep(-1); stopShowTimer(); startShowTimer(); });
+    swNext.addEventListener("click", function(){ goShowStep(1); stopShowTimer(); startShowTimer(); });
+    showPage = 0;
+    goShow(0);
+    bindShowSwipe();
     startShowTimer();
   }
 
